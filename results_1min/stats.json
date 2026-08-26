@@ -1,0 +1,71 @@
+{
+  "setup": {
+    "bar": "1min",
+    "window_bars": 1950,
+    "entry_z": 2.0,
+    "exit_z": 0.5,
+    "period": [
+      "2021-01-04 14:30:00+00:00",
+      "2026-03-31 20:00:00+00:00"
+    ],
+    "bars": 485613,
+    "initial_capital": 100000.0,
+    "commission_per_fill": 1.5,
+    "spread_cents": 1.0,
+    "exec_lag_bars": 1,
+    "note": "parametreler sabit (optimize edilmedi) -> tum donem kullanildi"
+  },
+  "by_slippage": {
+    "1/10000": {
+      "total_trades": 1113,
+      "win_rate_pct": 43.4,
+      "total_return_pct": 9.14,
+      "max_drawdown_pct": -8.64,
+      "profit_factor": 1.127,
+      "net_pnl": 9138.72,
+      "gross_pnl": 15816.72,
+      "commission": 6678.0,
+      "slippage_spread": 19718.21
+    },
+    "2/10000": {
+      "total_trades": 1113,
+      "win_rate_pct": 37.2,
+      "total_return_pct": -7.57,
+      "max_drawdown_pct": -15.84,
+      "profit_factor": 0.9,
+      "net_pnl": -7574.08,
+      "gross_pnl": -896.08,
+      "commission": 6678.0,
+      "slippage_spread": 33832.17
+    },
+    "3/10000": {
+      "total_trades": 1113,
+      "win_rate_pct": 32.52,
+      "total_return_pct": -21.78,
+      "max_drawdown_pct": -25.57,
+      "profit_factor": 0.724,
+      "net_pnl": -21784.53,
+      "gross_pnl": -15106.53,
+      "commission": 6678.0,
+      "slippage_spread": 45724.51
+    }
+  },
+  "duration": {
+    "avg_market_minutes": 194.97,
+    "median_market_minutes": 11.0,
+    "min_market_minutes": 1.0,
+    "max_market_minutes": 2184.0,
+    "avg_market_hours": 3.25,
+    "avg_market_trading_days": 0.5,
+    "avg_wall_clock_minutes": 1056.48,
+    "avg_wall_clock_days": 0.73
+  },
+  "beta": {
+    "median": 0.5831,
+    "mean": 0.5949,
+    "std": 0.2205,
+    "min": 0.001,
+    "max": 2.0,
+    "pct_negative": 0.0
+  }
+}

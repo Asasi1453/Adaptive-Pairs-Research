@@ -1,0 +1,90 @@
+Veri : 103068 bar  2021-01-04 14:30:00+00:00 -> 2026-03-31 20:00:00+00:00
+TRAIN:  49114 bar  2021-01-04 14:30:00+00:00 -> 2023-06-30 20:00:00+00:00
+TEST :  53954 bar  2023-07-03 13:30:00+00:00 -> 2026-03-31 20:00:00+00:00
+Sermaye $100,000 | komisyon $1.5/fill (= $6/trade) | spread 1.0c
+
+======================================================================
+KALMAN
+======================================================================
+sinyal hesaplaniyor...
+  beta: medyan=0.602  negatif=0.00%
+  z   : |z|>2 orani=0.00%  std=21.48
+
+  TRAIN en iyi 5 (135/1005 gecerli kombinasyon):
+ entry_z  exit_z  total_trades  win_rate_pct  total_return_pct  max_drawdown_pct
+    0.95    0.45            20          50.0         -0.060483         -0.537096
+    0.90    0.45            20          50.0         -0.060483         -0.537096
+    0.90    0.10            20          45.0         -0.082222         -0.826249
+    0.95    0.10            20          45.0         -0.082222         -0.826249
+    0.90    0.50            20          50.0         -0.201809         -0.537122
+
+  SECILEN: entry_z=0.95  exit_z=0.45  (train -0.06%, 20 trade)
+
+  TEST (out-of-sample):
+
+  --- slipaj 1/10000 ---
+  trade=13  win=46.2%  getiri=-0.30%  maxDD=-0.46%
+  brut PnL=$-223  komisyon=$78  slipaj+spread=$260  net=$-301
+  trade basi: $-23.16 (-0.018%)  PF=0.54  ort.sure=1 bar
+
+  --- slipaj 2/10000 ---
+  trade=13  win=46.2%  getiri=-0.53%  maxDD=-0.64%
+  brut PnL=$-451  komisyon=$78  slipaj+spread=$488  net=$-529
+  trade basi: $-40.66 (-0.038%)  PF=0.32  ort.sure=1 bar
+
+  --- slipaj 3/10000 ---
+  trade=13  win=38.5%  getiri=-0.76%  maxDD=-0.82%
+  brut PnL=$-678  komisyon=$78  slipaj+spread=$715  net=$-756
+  trade basi: $-58.12 (-0.058%)  PF=0.18  ort.sure=1 bar
+
+======================================================================
+WAVELET
+======================================================================
+sinyal hesaplaniyor...
+  beta: medyan=0.722  negatif=0.00%
+  z   : |z|>2 orani=14.02%  std=1.40
+
+  TRAIN en iyi 5 (954/1005 gecerli kombinasyon):
+ entry_z  exit_z  total_trades  win_rate_pct  total_return_pct  max_drawdown_pct
+    2.20    0.05           163     63.803681         19.864680         -2.602060
+    2.40    0.05           140     63.571429         19.789499         -3.206341
+    2.45    0.05           137     63.503650         19.783370         -3.520224
+    2.15    0.05           170     62.352941         19.715045         -2.915337
+    2.50    0.05           132     63.636364         19.111230         -3.431101
+
+  SECILEN: entry_z=2.2  exit_z=0.05  (train +19.86%, 163 trade)
+
+  TEST (out-of-sample):
+
+  --- slipaj 1/10000 ---
+  trade=181  win=66.3%  getiri=+7.79%  maxDD=-3.32%
+  brut PnL=$8,879  komisyon=$1,086  slipaj+spread=$3,504  net=$7,793
+  trade basi: $43.06 (+0.045%)  PF=1.29  ort.sure=177 bar
+
+  --- slipaj 2/10000 ---
+  trade=181  win=64.1%  getiri=+4.57%  maxDD=-4.07%
+  brut PnL=$5,655  komisyon=$1,086  slipaj+spread=$6,499  net=$4,569
+  trade basi: $25.24 (+0.025%)  PF=1.17  ort.sure=177 bar
+
+  --- slipaj 3/10000 ---
+  trade=181  win=59.1%  getiri=+1.44%  maxDD=-5.00%
+  brut PnL=$2,526  komisyon=$1,086  slipaj+spread=$9,404  net=$1,440
+  trade basi: $7.95 (+0.005%)  PF=1.05  ort.sure=177 bar
+
+======================================================================
+OZET - TEST donemi getirisi (%)
+======================================================================
+         slip 1/10000  slip 2/10000  slip 3/10000
+method                                           
+kalman          -0.30         -0.53         -0.76
+wavelet          7.79          4.57          1.44
+
+Yillara gore net PnL ($, slipaj 2/10000):
+           kalman  wavelet
+exit_time                 
+2023         73.0   -419.0
+2024       -550.0     63.0
+2025        -91.0   4091.0
+2026         40.0    834.0
+
+Kaydedildi -> ../results/

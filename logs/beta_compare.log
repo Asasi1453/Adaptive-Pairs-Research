@@ -1,0 +1,12 @@
+485,614 bar — ham beta hesaplaniyor...
+
+HAM beta     : medyan=0.713  ort=0.719  std=0.341
+               min=-1.61  max=3.85  (p1=0.09, p99=1.87)
+               NEGATIF=0.67%   >2 olan=0.66%
+               0.2-1.5 disinda=5.76%
+
+KIRPILMIS    : medyan=0.713  ort=0.719  std=0.308
+               alt sinira yapisik=0.67%  ust sinira yapisik=0.66%
+               0.2-1.5 disinda (giris yasak)=5.76%
+
+Kaydedildi -> ../results_1min/beta_raw_vs_clipped.png, beta_stats.json

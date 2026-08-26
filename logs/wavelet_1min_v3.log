@@ -1,0 +1,36 @@
+1-dakikalik: 485,614 bar  2021-01-04 14:30:00+00:00 -> 2026-03-31 20:00:00+00:00
+pencere=1950 bar (~1 islem haftasi)  entry=2.0s  exit=0.5s
+wavelet sinyali hesaplaniyor...
+  giris izni: 94.9% bar (beta 0.2-1.5 disindaki barlarda yeni giris yok)
+  beta: medyan=0.715  negatif=0.00%
+  z   : |z|>2=13.74%  std=1.39
+
+====================================================================
+WAVELET · 1-DAKIKALIK · entry=2.0σ / exit=0.5σ
+====================================================================
+Donem      : 2021-01-04 -> 2026-03-31  (485,614 bar)
+Sermaye    : $100,000 | komisyon $1.5/fill ($6/trade)
+Pencere    : 1950 bar (~1 islem haftasi) | emir gecikmesi 1 bar
+
+    slipaj   trade    win%   getiri%   maxDD%     PF       net $
+      1/1e4     771    52.0    +20.02    -4.38   1.29      20,016
+      2/1e4     771    47.7     +6.94    -8.42   1.10       6,938
+      3/1e4     771    44.6     -4.74   -14.76   0.93      -4,737
+
+--- TRADE SURESI (slipaj 2/10000, 771 trade) ---
+  Ortalama MARKET TIME : 263.7 dk (4.39 saat = 0.68 islem gunu)
+  Medyan market time   : 72.0 dk
+  Min / Max            : 1 dk / 3,071 dk
+  Ortalama duvar saati : 1,468.9 dk (1.02 takvim gunu)
+
+--- BETA ---
+  medyan=0.7153  ort=0.7237  std=0.3037  min=0.0  max=2.0  negatif=0.0%
+
+Kaydedildi -> ../results_1min/
+  stats.json
+  stats.txt
+  trades.csv
+  pnl_per_trade.png
+  equity_curve_pct.png
+  trade_duration.png
+  beta_over_time.png
