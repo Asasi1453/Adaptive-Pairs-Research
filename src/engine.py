@@ -62,10 +62,13 @@ def _size_factors(beta: np.ndarray, vol_window: int, lo: float, hi: float) -> np
     """
     Beta'nin rolling volatilitesine gore sermaye kullanim orani.
     Beta normalden oynaksa (hedge orani guvenilmezse) daha az sermaye kullan.
-    Referans = medyan beta-volatilitesi. Kaldirac yok (ust sinir hi).
+    Referans = yalnizca onceki barlarin medyan beta-volatilitesi.
+    Gelecekte eklenen barlar gecmisteki pozisyon boyutunu degistiremez.
+    Kaldirac yok (ust sinir hi).
     """
-    vol = pd.Series(beta).rolling(vol_window, min_periods=30).std().to_numpy()
-    ref = np.nanmedian(vol)
+    vol_series = pd.Series(beta).rolling(vol_window, min_periods=30).std()
+    ref = vol_series.expanding(min_periods=1).median().shift(1).to_numpy()
+    vol = vol_series.to_numpy()
     with np.errstate(divide="ignore", invalid="ignore"):
         f = np.where((vol > 0) & np.isfinite(vol) & np.isfinite(ref), ref / vol, 1.0)
     return np.clip(np.nan_to_num(f, nan=1.0, posinf=hi), lo, hi)

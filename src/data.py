@@ -2,16 +2,19 @@
 
 import numpy as np
 import pandas as pd
+import warnings
 
 from config import CFG
 
 
 def load_pair(path: str = None, resample: str = None,
-              regular_hours_only: bool = None, clean: bool = True) -> pd.DataFrame:
+              regular_hours_only: bool = None, clean: bool = False) -> pd.DataFrame:
     """
     V ve MA kapanis fiyatlarini tek bir DataFrame'de hizalar.
 
     Donen DataFrame: DatetimeIndex (UTC), kolonlar ['price_v', 'price_ma'].
+    Varsayilan, fiyat sicramalarini korur. clean=True yalnizca geriye donuk
+    veri incelemesi icindir: sonraki bara bakarak veri siler.
     """
     path = path or CFG.data_path
     resample = resample if resample is not None else CFG.resample
@@ -47,8 +50,9 @@ def clean_bad_prints(df: pd.DataFrame, jump: float = 0.015,
     Tek-bar bozuk print temizligi.
 
     Imza: bar t'de buyuk bir siçrama (|log getiri| > jump) ve hemen ardindan
-    t+1'de bunun cogunu (>revert orani) geri alan ters yonlu hareket. Gercek
-    bir fiyat hareketi geri donmez; bu desen hatali bir print'tir.
+    t+1'de bunun cogunu (>revert orani) geri alan ters yonlu hareket.
+    Bu desen tek basina veri hatasini kanitlamaz; gercek hareketler de geri
+    donebilir. t+1 kullanildigi icin yalnizca retrospektif tani amaclidir.
 
     Neden onemli: beta = cov/var oldugu icin TEK bir aykiri cift butun
     pencereyi bozar. Olculdu (2023-01-24 acilis bari): o bari iceren
@@ -59,6 +63,11 @@ def clean_bad_prints(df: pd.DataFrame, jump: float = 0.015,
     Bozuk bar SILINIR; boylece t-1 -> t+1 getirisi dogrudan hesaplanir ve
     gercek net hareket korunur, sahte sicrama yok olur.
     """
+    warnings.warn(
+        "Retrospective cleaner uses future prices (t+1); do not use it "
+        "to claim a causal backtest. Price reversals need not be bad prints.",
+        UserWarning, stacklevel=2,
+    )
     bad = np.zeros(len(df), dtype=bool)
     for col in ("price_v", "price_ma"):
         r = np.log(df[col].to_numpy())

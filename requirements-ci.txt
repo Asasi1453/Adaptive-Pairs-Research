@@ -1,0 +1,5 @@
+# Exact package versions used for the synthetic regression checks.
+numpy==2.0.2
+pandas==2.3.3
+PyWavelets==1.6.0
+pyarrow==21.0.0

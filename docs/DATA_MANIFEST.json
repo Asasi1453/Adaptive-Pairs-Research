@@ -1,0 +1,20 @@
+{
+  "file": "data/processed/pair_V_MA.parquet",
+  "size_bytes": 19738685,
+  "sha256": "69c0bb29f6069f4cf0a87233c6309fb4c00d1752df1456bd51c0e81e02d3f611",
+  "rows_before_filtering": 1038776,
+  "columns": [
+    "timestamp",
+    "open",
+    "high",
+    "low",
+    "close",
+    "volume",
+    "ticker"
+  ],
+  "upstream_dataset": "https://huggingface.co/datasets/mito0o852/OHLCV-1m",
+  "upstream_revision": null,
+  "upstream_timestamp_definition": "Start time of the minute (dataset card checked 2026-09-13)",
+  "ingestion_recipe_recorded": false,
+  "note": "Existing tracked snapshot; source revision and corporate-action treatment have not been verified."
+}

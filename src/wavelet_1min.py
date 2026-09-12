@@ -2,9 +2,9 @@
 WAVELET stratejisi - 1 DAKIKALIK bar analizi.
 
 Sabit parametreler: entry_z = 2.0 sigma, exit_z = 0.5 sigma.
-Parametreler onceden sabitlendigi (optimize edilmedigi) icin train/test
-ayrimina gerek yok - hicbir sey veriye fit edilmiyor, dolayisiyla TUM
-donem (2021-01 .. 2026-03) uzerinde calistirilir.
+TUM donem (2021-01 .. 2026-03) uzerinde kesifsel olarak calistirilir.
+Sabit esikler bagimsiz test yerine gecmez: yontem ve veri temizligi
+secimleri de bu doneme bakilarak yapilmis olabilir. Bakiniz docs/RESEARCH_AUDIT.md.
 
 Pencere: 1950 bar. 5-dakikalik kosudaki 390 barlik pencere ile AYNI
 ekonomik geriye bakisi (1 islem haftasi) korur: 390 x 5dk = 1950 x 1dk.
@@ -121,7 +121,7 @@ def main():
             "bars": len(df), "initial_capital": CFG.initial_capital,
             "commission_per_fill": CFG.commission_per_fill,
             "spread_cents": CFG.spread_cents, "exec_lag_bars": 1,
-            "note": "parametreler sabit (optimize edilmedi) -> tum donem kullanildi",
+            "note": "kesifsel tam-donem kosusu; sabit esikler bagimsiz out-of-sample test degildir",
         },
         "by_slippage": {f"{s:g}/10000": {
             "total_trades": r[2]["total_trades"],

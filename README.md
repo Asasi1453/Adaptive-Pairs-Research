@@ -1,87 +1,61 @@
-# V / MA Pairs Trading — Kalman & Wavelet
+# Adaptive Pairs Research
 
-Visa (V) ve Mastercard (MA) çifti üzerinde pairs trading araştırması. İki **bağımsız**
-hedge-ratio tahmin yöntemi karşılaştırılıyor: Kalman filter ve wavelet transform.
+**V/MA pairs trading with Kalman and wavelet estimators.**
 
-Veri: [mito0o852/OHLCV-1m](https://huggingface.co/datasets/mito0o852/OHLCV-1m) —
-dakikalık OHLCV, 2021-01 → 2026-03, sadece normal seans (09:30–16:00 ET).
+An exploratory comparison of adaptive hedge estimates for Visa and Mastercard, with a focus on how data handling, execution assumptions and transaction costs affect conclusions.
 
-## Yöntem
+**Status:** methodology under revision. Historical return tables predate the September 2026 review and should not be treated as validated performance. Two future-data dependencies have been corrected; additional modeling issues remain documented below.
 
-**Kalman** — `V_t = α_t + β_t·MA_t`, katsayılar random walk. Fiyat seviyeleri üzerinde
-çalışır; tüm geçmişi bir prior ile biriktirdiği için β stabil kalır.
+## Research question
 
-**Wavelet** — β, **log getiriler** üzerinden hesaplanır (seviyeler üzerinde kısa pencere
-regresyonu sahte regresyon üretiyordu). Getiriler wavelet (db4, VisuShrink soft-threshold)
-ile denoise edilir, ardından `spread = log(V) − β·log(MA)` kurulup pencerenin kendi
-ortalama/std'siyle z-score'lanır.
+Does wavelet-denoised return estimation offer a useful advantage over simpler hedge estimates once evaluation is chronological and trading assumptions are explicit?
 
-Sinyal: `|z| > entry_z` iken pozisyon açılır, `|z| ≤ exit_z` iken kapatılır.
+The current implementation contains a Kalman price-level model and a wavelet-denoised return model. They are different models with different coefficient units, so their conversion into tradable positions needs further work before a fair performance comparison.
 
-## Gerçekçilik önlemleri
+## Start with the evidence
 
-Backtest sonucunu ciddi şekilde etkileyen, sırayla bulunup düzeltilen konular:
+- [Research note and next experiment](docs/RESEARCH_NOTE.md)
+- [Methodology review and remaining issues](docs/RESEARCH_AUDIT.md)
+- [Regression checks](tests/test_causality.py)
+- [Original Turkish write-up — legacy, not current validation](README.legacy.md)
 
-| Konu | Etki |
-|---|---|
-| **Emir gecikmesi** — sinyal bar kapanışında üretilip aynı kapanıştan işlem yapılamaz; 1 bar kaydırıldı | edge'in ~yarısı |
-| **Bozuk veri printi** — 2023-01-24 açılışında V/MA ters yönde hatalı fiyat; `cov/var` tek aykırı çifte duyarlı olduğundan β bir hafta boyunca −0.82'ye çakılıyordu | negatif β %0.67 → %0.26 |
-| **Gecelik boşluklar** — açılış barının "1 dakikalık getirisi" aslında ~17.5 saatlik hareket; kovaryansta orantısız ağırlık kazanıyordu | negatif β %0.26 → **%0.00** |
-| **Maliyetler** — komisyon ($1.5/fill × 4), 1¢ spread, slipaj senaryoları | ham edge'in büyük kısmı |
-| **Train/test ayrımı** — parametre yalnızca train'de seçilir, sonuç yalnızca test'te ölçülür | overfitting'i açığa çıkardı |
-| **β sağlık filtresi** — β ∉ [0.2, 1.5] iken yeni giriş yok (pozisyon tutulur; zorla kapatmak churn üretiyordu) | — |
+## Run the small reproducibility check
 
-## Kurulum
+Run from the repository root. No downloaded market data are needed for these synthetic regression checks.
 
-```bash
-python3 -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
+```sh
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements-ci.txt
+python -m unittest discover -s tests -v
 ```
 
-Veri `data/processed/pair_V_MA.parquet` altında beklenir (repoda yok, `.gitignore`).
+The checks cover historical position-size invariance when future observations are appended, already-closed trade invariance, default loader behavior around a jump/reversal, warnings on retrospective cleaning, finite sizing, signal-prefix invariance, next-bar execution and four-fill commissions. They do not certify the entire backtest as causal or economically correct.
 
-## Çalıştırma
+## Market-data experiments
 
-```bash
-cd src
+Install `requirements.txt` for the plotting and research scripts. The original data loader expects a Parquet file with `timestamp`, `ticker`, and `close` columns for V and MA. A processed V/MA snapshot is tracked at `data/processed/pair_V_MA.parquet` (1,038,776 rows before filtering and alignment). See [the data manifest](docs/DATA_MANIFEST.json) for its SHA-256 and source. A complete upstream ingestion recipe and source revision were not recorded. The existing `.gitignore` rule does not untrack this already committed file.
 
-# 5-dakikalık, train/test protokolü, grid search + out-of-sample
-python run.py
+From the repository root, existing exploratory entry points are:
 
-# 1-dakikalık, sabit eşikler (entry 2.0σ / exit 0.5σ), tüm grafikler
-python wavelet_1min.py --out-dir ../results_1min
-
-# ham vs kırpılmış β karşılaştırması, ±1σ/±2σ bantlarıyla
-python beta_compare.py --out-dir ../results_1min
+```sh
+python src/run.py --data data/processed/pair_V_MA.parquet --out-dir results
+python src/wavelet_1min.py --data data/processed/pair_V_MA.parquet --out-dir results_1min
 ```
 
-Tüm parametreler [`src/config.py`](src/config.py) içinde.
+These are legacy research entry points, not a completed confirmatory protocol. The first selects thresholds on a chronological training portion. The one-minute script evaluates fixed thresholds over the full period; fixed thresholds alone do not make it out-of-sample.
 
-## Dosyalar
+The default loader now preserves price jumps. Explicit `clean=True` performs retrospective diagnostics using the next observation and emits a warning; it is unsuitable as evidence of causal trading performance.
 
-| Dosya | Görev |
+## Implementation map
+
+| File | Responsibility |
 |---|---|
-| `src/config.py` | Tüm parametreler |
-| `src/data.py` | Yükleme, hizalama, bozuk print temizliği, seans maskesi |
-| `src/signals.py` | Kalman ve wavelet sinyalleri (bağımsız) |
-| `src/engine.py` | Backtest: maliyetler, pozisyon boyutu, emir gecikmesi |
-| `src/metrics.py` | Performans metrikleri |
-| `src/run.py` | 5-dk train/test protokolü |
-| `src/wavelet_1min.py` | 1-dk analiz + grafikler |
-| `src/beta_compare.py` | Ham vs kırpılmış β |
+| `src/data.py` | Alignment, session handling and optional retrospective diagnostics |
+| `src/signals.py` | Kalman and wavelet estimators |
+| `src/engine.py` | Positions, sizing, fills and trade ledger |
+| `src/metrics.py` | Summary statistics from the current ledger |
+| `src/run.py` | Existing five-minute threshold search and temporal split |
+| `src/wavelet_1min.py` | Existing full-period exploratory analysis |
 
-## Sonuç
-
-1-dakikalık, entry 2.0σ / exit 0.5σ, $100k sermaye, 1113 trade:
-
-| Slipaj | Getiri | Max DD | Win% | PF |
-|---|---|---|---|---|
-| 1/10000 | +9.14% | −8.64% | 43.4 | 1.13 |
-| 2/10000 | **−7.57%** | −15.84% | 37.2 | 0.90 |
-| 3/10000 | −21.78% | −25.57% | 32.5 | 0.72 |
-
-Gerçekçi slipaj varsayımı altında strateji **kâr etmiyor**. Erken koşularda görülen
-pozitif sonuçlar, sonradan düzeltilen veri/metodoloji hatalarının ürünüydü — özellikle
-bozuk hedge oranı ve aynı-bar işlem varsayımı. Ortalama tutuş süresi 195 dk (medyan 11 dk).
-
-Bu bir araştırma çalışmasıdır, yatırım tavsiyesi değildir.
+Before reporting updated performance, resolve hedge-ratio units, signal/execution parameter timing, bar-level equity accounting and consistent session/beta filters across entry points. Then record data provenance and rerun a frozen evaluation protocol. No claim of a profitable trading strategy is made.
